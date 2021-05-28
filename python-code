@@ -1,0 +1,41 @@
+import pandas as pd 
+import smtplib
+import getpass
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+
+
+file = open("emailTemplate.txt")#HTML template for email
+code = file.read()
+file.close()
+
+
+user = input('Username: ')
+psw = getpass.getpass(prompt='Password(will not show): ')
+subj = input('Email Subject: ')
+
+theMessage = MIMEMultipart("alternative")
+
+theMessage["From"] = user
+theMessage['Subject'] = subj
+
+
+part_2 = MIMEText(code,"html")
+
+
+theMessage.attach(part_2)
+
+e = pd.read_excel("EmailsTest.xlsx")#Email list to send to
+emails = e['Emails'].values
+
+server = smtplib.SMTP("smtp.gmail.com",587)
+server.ehlo()
+server.starttls()
+server.login(user,psw)
+Message = "Hello!"#Message of the email
+
+
+for email in emails:
+    server.sendmail(user,email,theMessage.as_string())
+server.quit()
